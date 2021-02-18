@@ -23,6 +23,9 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         $isadmin = $user->isadm;
+        if($isadmin){
+            return view('admindashboard');
+        }
         $userid = $user->id;
         $entry =  tb_entry::where('user_id',$userid)->first();
         if($entry == null){
@@ -31,8 +34,30 @@ class DashboardController extends Controller
         else{
             $entrypendaftar = true;
         }
-        // dd($entrypendaftar);
         return view('dashboard')->with('sudahdaftar',$entrypendaftar);
+    }
+
+    public function lihatEntry($id)
+    {
+        $user = Auth::user();
+        $isadmin = $user->isadm;
+        $entry = tb_entry::where('id', $id)->first();
+
+        if(!$isadmin){
+            $ent =  tb_entry::where('user_id',$userid)->first();
+            return view('dashboard');
+            if($ent == null){
+                $ent2 = false;
+            }
+            else{
+                $ent2 = true;
+            }
+            return view('dashboard')->with('sudahdaftar',$ent2);
+
+        }
+
+
+        return view('view.entry')->with('entrydata',$entry);
     }
 
     public function daftar()
@@ -69,7 +94,15 @@ class DashboardController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        //Validator
+        $this->validate($request, [
+            'posisi'   => 'required',
+            //...
+        ]);
+        $entry = new tb_entry();
+        $entry->posisi = $request->posisi;
+        //..
+        $entry->save();
     }
 
     /**
